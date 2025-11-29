@@ -1,6 +1,6 @@
 <?php
 
-namespace DevTools\Commands;
+namespace DevTools\Commands\Domain;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +16,7 @@ class MakeRepositoryCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->config = require __DIR__ . '/../../config.php';
+        $this->config = require __DIR__ . '/../../../config.php';
     }
 
     protected function configure(): void
@@ -24,17 +24,18 @@ class MakeRepositoryCommand extends Command
         $this
             ->setDescription('Generate a repository interface for an entity')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
-            ->addOption('entity-namespace', null, InputOption::VALUE_OPTIONAL, 'Entity namespace', 'App\\Domain')
-            ->addOption('repository-namespace', null, InputOption::VALUE_OPTIONAL, 'Repository namespace', 'App\\Domain\\Repository')
-            ->addOption('base-repository', null, InputOption::VALUE_OPTIONAL, 'Base repository interface', 'App\\Domain\\Repository\\RepositoryInterface');
+            ->addOption('entity-namespace', null, InputOption::VALUE_OPTIONAL, 'Entity namespace')
+            ->addOption('repository-namespace', null, InputOption::VALUE_OPTIONAL, 'Repository namespace')
+            ->addOption('base-repository', null, InputOption::VALUE_OPTIONAL, 'Base repository interface');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityName = $input->getOption('name');
-        $entityNamespace = $input->getOption('entity-namespace') ?: $this->config['default_namespaces']['entity'] . "\\$entityName";
-        $repositoryNamespace = $input->getOption('repository-namespace') ?: $this->config['default_namespaces']['repository'] . "\\$entityName";
-        $baseRepository = $input->getOption('base-repository') ?: $this->config['default_namespaces']['repository'] . "\\$entityName\\RepositoryInterface";
+        $entityNamespace = $input->getOption('entity-namespace') ?: $this->config['default_namespaces']['entity'];
+        $repositoryNamespace = $input->getOption('repository-namespace') ?: $this->config['default_namespaces']['entity_repository'];
+        $baseRepository = $input->getOption('base-repository') ?: "RepositoryInterface";
+        $baseRepositoryNamespace = $this->config['default_namespaces']['entity_repository'];
 
         $templatePath = $this->config['templates']['entity_repository'] ?? null;
         if (!$templatePath || !file_exists($templatePath)) {
@@ -44,17 +45,18 @@ class MakeRepositoryCommand extends Command
         $template = file_get_contents($templatePath);
 
         $content = str_replace(
-            ['{{ repositoryNamespace }}', '{{ entityNamespace }}', '{{ entityName }}', '{{ baseRepositoryInterface }}', '{{ entityName }}Id'],
-            [$repositoryNamespace, $entityNamespace, $entityName, $baseRepository, $entityName . 'Id'],
+            ['{{ baseRepositoryNamespace }}', '{{ repositoryNamespace }}', '{{ entityNamespace }}', '{{ entityName }}', '{{ baseRepositoryInterface }}', '{{ entityName }}Id'],
+            [$baseRepositoryNamespace, $repositoryNamespace, $entityNamespace, $entityName, $baseRepository, $entityName . 'Id'],
             $template
         );
 
-        $defaultDir = $this->config['default_paths']['entity_repository'] ?? 'src';
-        $namespaceDir = str_replace('\\', '/', $repositoryNamespace);
-        $dir = !empty($repositoryNamespace) ? $namespaceDir : $defaultDir;
+        // $defaultDir = $this->config['default_paths']['entity_repository'] ?? 'src';
+        // $namespaceDir = str_replace('\\', '/', $repositoryNamespace);
+        // $dir = !empty($repositoryNamespace) ? $namespaceDir : $defaultDir;
+        $dir = $this->config['default_paths']['entity_repository'] ?? 'src';
         $this->ensureDirectory($dir);
 
-$file = "{$dir}/{$entityName}RepositoryInterface.php";
+        $file = "{$dir}/{$entityName}RepositoryInterface.php";
         file_put_contents($file, $content);
 
         $output->writeln("<info>Repository interface {$entityName}Repository generated!</info>");

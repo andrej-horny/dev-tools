@@ -1,6 +1,6 @@
 <?php
 
-namespace DevTools\Commands;
+namespace DevTools\Commands\Domain;
 
 use Symfony\Component\Console\Command\Command;
 
@@ -11,7 +11,7 @@ abstract class BaseGeneratorCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->config = require __DIR__ . '/../../config.php';
+        $this->config = require __DIR__ . '/../../../config.php';
     }
 
     /**
@@ -68,9 +68,10 @@ PHP;
             $template
         );
 
-        $defaultDir = $this->config['default_paths'][$type] ?? 'src';
-        $namespaceDir = str_replace('\\', '/', $namespace);
-        $dir = !empty($namespace) ? $namespaceDir : $defaultDir;
+        // $defaultDir = $this->config['default_paths'][$type] ?? 'src';
+        // $namespaceDir = str_replace('\\', '/', $namespace);
+        // $dir = !empty($namespace) ? $namespaceDir : $defaultDir;
+        $dir = $this->config['default_paths'][$type] ?? 'src';
         $this->ensureDirectory($dir);
 
         $file = "{$dir}/{$className}.php";

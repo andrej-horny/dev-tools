@@ -1,6 +1,6 @@
 <?php
 
-namespace DevTools\Commands;
+namespace DevTools\Commands\Domain;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

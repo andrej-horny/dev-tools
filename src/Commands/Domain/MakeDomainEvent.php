@@ -1,19 +1,19 @@
 <?php
 
-namespace DevTools\Commands;
+namespace DevTools\Commands\Domain;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeValueObjectCommand extends BaseGeneratorCommand
+class MakeDomainEventCommand extends BaseGeneratorCommand
 {
-    protected static $defaultName = 'make:value-object';
+    protected static $defaultName = 'make:domain-event';
 
     protected function configure()
     {
         $this
-            ->setDescription('Generate a DDD ValueObject class')
+            ->setDescription('Generate a DDD DomainEvent class')
             ->addArgument('name', InputArgument::REQUIRED)
             ->addArgument('namespace', InputArgument::OPTIONAL)
             ->addArgument('properties', InputArgument::OPTIONAL);
@@ -22,7 +22,7 @@ class MakeValueObjectCommand extends BaseGeneratorCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $className = $input->getArgument('name');
-        $namespace = $input->getArgument('namespace') ?: $this->config['default_namespaces']['value_object'];
+        $namespace = $input->getArgument('namespace') ?: $this->config['default_namespaces']['domain_event'];
         $propsArg = $input->getArgument('properties') ?? '';
         $props = [];
 
@@ -32,8 +32,11 @@ class MakeValueObjectCommand extends BaseGeneratorCommand
             }
         }
 
-        $file = $this->generateClass('value_object', $className, $namespace, $props);
-        $output->writeln("<info>ValueObject {$className} generated in {$file}</info>");
+        // DomainEvents always have occurredAt timestamp
+        $extraParams = [['type' => '\DateTimeImmutable', 'name' => 'occurredAt']];
+
+        $file = $this->generateClass('domain_event', $className, $namespace, $props, $extraParams);
+        $output->writeln("<info>DomainEvent {$className} generated in {$file}</info>");
 
         return self::SUCCESS;
     }
