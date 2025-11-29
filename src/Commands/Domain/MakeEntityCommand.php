@@ -16,7 +16,8 @@ class MakeEntityCommand extends BaseGeneratorCommand
         $this
             ->setDescription('Generate a DDD Entity class')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
-            ->addOption('namespace', null, InputOption::VALUE_OPTIONAL, 'Namespace')
+            ->addOption('pkg-namespace', 'pkg-ns', InputOption::VALUE_OPTIONAL, 'Package namespace')
+            ->addOption('domain-namespace', 'd-ns', InputOption::VALUE_OPTIONAL, 'Domain namespace')
             ->addOption('props', null, InputOption::VALUE_OPTIONAL, 'Comma separated props')
             // ->addOption('with-id', null, InputOption::VALUE_NONE, 'Also generate the entity ID value object')
             ->addOption('with-repo', null, InputOption::VALUE_NONE, 'Also generate the repository for this entity')
@@ -28,7 +29,9 @@ class MakeEntityCommand extends BaseGeneratorCommand
     {
         $application = $this->getApplication();
         $className = $input->getOption('name');
-        $namespace = $input->getOption('namespace') ?: $this->config['default_namespaces']['entity'];
+        $packageNamespace = $input->getOption('pkg-namespace');
+        $domainNamespace = $input->getOption('domain-namespace');
+        $namespace = $packageNamespace . '\\' . $this->config['default_namespaces']['entity'] . '\\'. $domainNamespace;
         $propsArg = $input->getOption('props') ?? '';
         $props = [];
 

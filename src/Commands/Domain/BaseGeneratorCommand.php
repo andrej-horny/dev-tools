@@ -11,7 +11,7 @@ abstract class BaseGeneratorCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->config = require __DIR__ . '/../../../config.php';
+        $this->config = require __DIR__ . '/../../../config/domain.php';
     }
 
     /**
@@ -63,14 +63,23 @@ PHP;
         $constructorParams = rtrim($constructorParams, ",\n");
 
         $content = str_replace(
-            ['{{namespace}}', '{{className}}', '{{properties}}', '{{constructorParams}}', '{{constructorAssignments}}', '{{accessors}}'],
-            [$namespace, $className, $properties, $constructorParams, '', $accessors],
+            [
+                '{{namespace}}', 
+                '{{className}}', 
+                '{{properties}}', 
+                '{{constructorParams}}', 
+                '{{accessors}}'
+            ],
+            [
+                $namespace, 
+                $className, 
+                $properties, 
+                $constructorParams, 
+                $accessors
+            ],
             $template
         );
 
-        // $defaultDir = $this->config['default_paths'][$type] ?? 'src';
-        // $namespaceDir = str_replace('\\', '/', $namespace);
-        // $dir = !empty($namespace) ? $namespaceDir : $defaultDir;
         $dir = $this->config['default_paths'][$type] ?? 'src';
         $this->ensureDirectory($dir);
 
