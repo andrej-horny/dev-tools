@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MakeValueObjectCommand extends BaseGeneratorCommand
 {
-    protected static $defaultName = 'make:value-object';
+    protected static $defaultName = 'make:domain:value-object';
 
     protected function configure()
     {

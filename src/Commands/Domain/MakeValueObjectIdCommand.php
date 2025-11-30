@@ -6,61 +6,54 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeRepositoryCommand extends BaseGeneratorCommand
+class MakeValueObjectIdCommand extends BaseGeneratorCommand
 {
-    protected static $defaultName = 'make:domain:repository';
+    protected static $defaultName = 'make:domain:value-object-id';
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('Generate a repository interface for an entity')
+            ->setDescription('Generate a DDD ValueObjectId class')
             ->addOption('entity-name', null, InputOption::VALUE_REQUIRED, 'Entity name')
             ->addOption('pkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Domain package namespace')
             ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $entityName = $input->getOption('entity-name');
         $packageNamespace = $input->getOption('pkg-namespace');
-        $domainName = $input->getOption('domain-name');
-
-        $template = $this->getTemplate('entity_repository');
+        $domainName = $input->getOption('domain-name') ?? null;
 
         // build namespace
         $namespace = $packageNamespace;
         $namespace .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
-        $namespace .= "\\Repositories";
+        $namespace .= "\\Entities";
 
-        // build entityClassPath
-        $entityClassPath = $packageNamespace;
-        $entityClassPath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
-        $entityClassPath .= "\\Entities\\$entityName";
+        $template = $this->getTemplate('value_object_id');
 
         $content = str_replace(
             [
                 '{{ namespace }}',
-                '{{ entityClassPath }}',
                 '{{ entityName }}',
             ],
             [
                 $namespace,
-                $entityClassPath,
                 $entityName,
             ],
             $template
         );
 
-        // $dir = $this->config['default_paths']['entity_repository'] ?? 'src';
+        // $dir = $this->config['default_paths']['value_object_id'] . "\\$domainName";
         $dir = 'src';
         $dir .= ($domainName !== null) ? '/Domain/' . $domainName : "";
-        $dir .= '/Repositories';
+        $dir .= '/Entities';
         $this->ensureDirectory($dir);
 
-        $file = "{$dir}/{$entityName}RepositoryInterface.php";
+        $file = "{$dir}/{$entityName}Id.php";
         file_put_contents($file, $content);
 
-        $output->writeln("<info>Repository interface {$entityName}Repository generated!</info>");
+        $output->writeln("<info>Value object Id {$entityName}Id generated!</info>");
 
         return self::SUCCESS;
     }

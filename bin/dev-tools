@@ -18,6 +18,7 @@ $application = new Application('Dev Tools', '1.0.0');
 $application->add(new Domain\MakeAccessorCommand());
 $application->add(new Domain\MakeEntityCommand());
 $application->add(new Domain\MakeEntityServiceCommand());
+$application->add(new Domain\MakeValueObjectIdCommand());
 // $application->add(new Domain\MakeValueObjectCommand());
 // $application->add(new Domain\MakeAggregateCommand());
 // $application->add(new Domain\MakeDomainEventCommand());

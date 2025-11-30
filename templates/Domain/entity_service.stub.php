@@ -1,9 +1,9 @@
 <?php
 
-namespace {{ serviceNamespace }};
+namespace {{ namespace }};
 
-use {{ entityNamespace }}\{{ entityName }};
-use {{ repositoryNamespace }}\{{ entityName }}RepositoryInterface;
+use {{ entityClassPath }};
+use {{ repositoryClassPath }};
 
 class {{ entityName }}Service
 {

@@ -2,57 +2,66 @@
 
 namespace DevTools\Commands\Domain;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeEntityServiceCommand extends Command
+class MakeEntityServiceCommand extends BaseGeneratorCommand
 {
-    protected array $config;
-
-    protected static $defaultName = 'make:entity-service';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->config = require __DIR__ . '/../../../config.php';
-    }
+    protected static $defaultName = 'make:domain:entity-service';
 
     protected function configure(): void
     {
         $this
             ->setDescription('Generate a create and update services for an entity')
-            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
-            ->addOption('entity-namespace', null, InputOption::VALUE_OPTIONAL, 'Entity namespace')
-            ->addOption('repository-namespace', null, InputOption::VALUE_OPTIONAL, 'Repository namespace')
-            ->addOption('service-namespace', null, InputOption::VALUE_OPTIONAL, 'Service namespace');
+            ->addOption('entity-name', null, InputOption::VALUE_REQUIRED, 'Entity name')
+            ->addOption('pkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Domain package namespace')
+            ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $entityName = $input->getOption('name');
-        $entityNamespace = $input->getOption('entity-namespace') ?: $this->config['default_namespaces']['entity'];
-        $repositoryNamespace = $input->getOption('repository-namespace') ?: $this->config['default_namespaces']['entity_repository'];
-        $serviceNamespace = $input->getOption('service-namespace') ?: $this->config['default_namespaces']['entity_service'];
+        $entityName = $input->getOption('entity-name');
+        $packageNamespace = $input->getOption('pkg-namespace');
+        $domainName = $input->getOption('domain-name');
 
-        $templatePath = $this->config['templates']['entity_service'] ?? null;
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new \RuntimeException("Template not found for entity_service at {$templatePath}");
-        }
+        $template = $this->getTemplate('entity_service');
 
-        $template = file_get_contents($templatePath);
+        // build namespace
+        $namespace = $packageNamespace;
+        $namespace .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $namespace .= "\\Services";
+
+        // build entityClassPath
+        $entityClassPath = $packageNamespace;
+        $entityClassPath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $entityClassPath .= "\\Entities\\$entityName";
+
+        // build repositoryClassPath
+        $repositoryClassPath = $packageNamespace;
+        $repositoryClassPath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $repositoryClassPath .= "\\Repositories\\{$entityName}RepositoryInterface";
 
         $content = str_replace(
-            ['{{ serviceNamespace }}', '{{ repositoryNamespace }}', '{{ entityNamespace }}', '{{ entityName }}'],
-            [$serviceNamespace, $repositoryNamespace, $entityNamespace, $entityName],
+            [
+                '{{ namespace }}',
+                '{{ entityClassPath }}',
+                '{{ repositoryClassPath }}',
+                '{{ entityName }}'
+            ],
+            [
+                $namespace,
+                $entityClassPath,
+                $repositoryClassPath,
+                $entityName
+            ],
+
             $template
         );
 
-        // $defaultDir = $this->config['default_paths']['entity_service'] ?? 'src';
-        // $namespaceDir = str_replace('\\', '/', $serviceNamespace);
-        // $dir = !empty($serviceNamespace) ? $namespaceDir : $defaultDir;
-        $dir = $this->config['default_paths']['entity_service'] ?? 'src';
+        $dir = 'src';
+        $dir .= ($domainName !== null) ? '/Domain/' . $domainName : "";
+        $dir .= '/Services';
         $this->ensureDirectory($dir);
 
         // create entity service
@@ -66,12 +75,5 @@ class MakeEntityServiceCommand extends Command
         $output->writeln("<info>Update {$entityName} service generated!</info>");
 
         return self::SUCCESS;
-    }
-
-    private function ensureDirectory(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
     }
 }

@@ -11,7 +11,7 @@ class MakeMapperCommand extends Command
 {
     protected array $config;
 
-    protected static $defaultName = 'make:infrastructure:mapepr';
+    protected static $defaultName = 'make:infrastructure:mapper';
 
     public function __construct()
     {
@@ -24,9 +24,9 @@ class MakeMapperCommand extends Command
         $this
             ->setDescription('Generate a mapepr between infrastructure model and domain entity')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
-            ->addOption('ipkg-namespace', 'ipkg-ns', InputOption::VALUE_OPTIONAL, 'Infrastructure package namespace')
-            ->addOption('domain-name', 'd-n', InputOption::VALUE_OPTIONAL, 'Domain name')
-            ->addOption('dpkg-namespace', 'dpkg-ns', InputOption::VALUE_OPTIONAL, 'Domain package namespace');
+            ->addOption('ipkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Infrastructure package namespace')
+            ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name')
+            ->addOption('dpkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Domain package namespace');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

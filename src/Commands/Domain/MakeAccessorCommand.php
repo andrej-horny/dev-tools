@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MakeAccessorCommand extends Command
 {
-    protected static $defaultName = 'make:accessors';
+    protected static $defaultName = 'make:domain:accessors';
 
     protected function configure()
     {

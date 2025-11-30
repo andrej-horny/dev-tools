@@ -25,7 +25,7 @@ return [
     // Default template paths
     'templates' => [
         'entity' => __DIR__ . '/../templates/Domain/entity.stub.php',
-        'value_object_id' => __DIR__ . '/../templates/Domain/value_object.stub.php',
+        'value_object_id' => __DIR__ . '/../templates/Domain/value_object_id.stub.php',
         'value_object' => __DIR__ . '/../templates/Domain/value_object.stub.php',
         'aggregate' => __DIR__ . '/../templates/Domain/entity.stub.php',
         'domain_event' => __DIR__ . '/../templates/Domain/entity.stub.php',

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MakeAggregateCommand extends BaseGeneratorCommand
 {
-    protected static $defaultName = 'make:aggregate';
+    protected static $defaultName = 'make:domain:aggregate';
 
     protected function configure()
     {

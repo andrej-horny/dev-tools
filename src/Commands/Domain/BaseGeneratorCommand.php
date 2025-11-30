@@ -64,17 +64,17 @@ PHP;
 
         $content = str_replace(
             [
-                '{{namespace}}', 
-                '{{className}}', 
-                '{{properties}}', 
-                '{{constructorParams}}', 
+                '{{namespace}}',
+                '{{className}}',
+                '{{properties}}',
+                '{{constructorParams}}',
                 '{{accessors}}'
             ],
             [
-                $namespace, 
-                $className, 
-                $properties, 
-                $constructorParams, 
+                $namespace,
+                $className,
+                $properties,
+                $constructorParams,
                 $accessors
             ],
             $template
@@ -84,12 +84,65 @@ PHP;
         $this->ensureDirectory($dir);
 
         $file = "{$dir}/{$className}.php";
-        file_put_contents($file, $content);
+        $this->createFile($file, $content);
 
         return $file;
     }
 
-    private function ensureDirectory(string $dir): void
+    protected function getTemplate(string $type): string|null
+    {
+        $templatePath = $this->config['templates'][$type] ?? null;
+        if (!$templatePath || !file_exists($templatePath)) {
+            throw new \RuntimeException("Template not found for {$type} at {$templatePath}");
+        }
+
+        return file_get_contents($templatePath);
+    }
+
+    protected function getContent(array $placeholders, array $values, string $template): string|null
+    {
+        return str_replace(
+            $placeholders,
+            $values,
+            $template
+        );
+    }
+
+    protected function parseConstructorParams(array $props): string|null
+    {
+        $constructorParams = '';
+
+        foreach ($props as $prop) {
+            $constructorParams .= "        private {$prop['type']} \${$prop['name']},\n";
+        }
+
+        return $constructorParams;
+    }
+
+    protected function parseAccessors(array $props): string|null
+    {
+        $accessors = '';
+
+        foreach ($props as $prop) {
+            $accessors .= <<<PHP
+
+    public function {$prop['name']}(): {$prop['type']}
+    {
+        return \$this->{$prop['name']};
+    }
+
+PHP;
+        }
+
+        return $accessors;
+    }
+
+    private function createFile(string $fileName, $content): void
+    {
+        file_put_contents($fileName, $content);
+    }
+
+    protected function ensureDirectory(string $dir): void
     {
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);

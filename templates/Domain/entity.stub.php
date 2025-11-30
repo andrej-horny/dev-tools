@@ -1,18 +1,18 @@
 <?php
 
-namespace {{namespace}};
+namespace {{ namespace }};
 
-class {{className}}
+final class {{ entityName }}
 {
     public function __construct(
-        private {{className}}Id $id,
-{{constructorParams}}
+        private {{ entityName }}Id $id,
+{{ constructorParams }}
     ) {}
 
-    public function id(): {{className}}Id
+    public function id(): {{ entityName }}Id
     {
         return $this->id;
     }
-{{accessors}}
+{{ accessors }}
 }
 

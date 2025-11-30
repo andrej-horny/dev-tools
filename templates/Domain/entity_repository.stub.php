@@ -1,12 +1,11 @@
 <?php
 
-namespace {{ repositoryNamespace }};
+namespace {{ namespace }};
 
-use {{ entityNamespace }}\{{ entityName }};
-use {{ entityNamespace }}\{{ entityName }}Id;
-use {{ baseRepositoryNamespace }}\{{ baseRepositoryInterface }};
+use {{ entityClassPath }};
+use {{ entityClassPath }}Id;
 
-interface {{ entityName }}RepositoryInterface extends {{ baseRepositoryInterface }}
+interface {{ entityName }}RepositoryInterface
 {
     public function findById({{ entityName }}Id $id): ?{{ entityName }};
     public function all(): array;

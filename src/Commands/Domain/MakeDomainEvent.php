@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MakeDomainEventCommand extends BaseGeneratorCommand
 {
-    protected static $defaultName = 'make:domain-event';
+    protected static $defaultName = 'make:domain:domain-event';
 
     protected function configure()
     {
