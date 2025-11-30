@@ -1,11 +1,11 @@
 <?php
 
-namespace {{ infrastructurePkgNamespace }}\{{ repositoryNamespace }}\{{ domainName }};
+namespace {{ namespace }};
 
-use {{ domainPkgNamespace }}\Entities\{{ entityName }};
-use {{ domainPkgNamespace }}\Repositories\{{ entityName }}RepositoryInterface;
-use {{ infrastructurePkgNamespace }}\{{ mapperNamespace }}\{{ domainName }}\{{ entityName }}Mapper;
-use {{ infrastructurePkgNamespace }}\{{ modelNamespace }}\{{ domainName }}\Eloquent{{ entityName }};
+use {{ entityClassPath }};
+use {{ repositoryInterfacePath }};
+use {{ mapperClassPath }};
+use {{ modelClassPath }};
 
 class {{ entityName }}RepositoryEloquent implements {{ entityName }}RepositoryInterface
 {

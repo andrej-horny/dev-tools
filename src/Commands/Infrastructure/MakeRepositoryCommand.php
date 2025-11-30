@@ -2,66 +2,82 @@
 
 namespace DevTools\Commands\Infrastructure;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeRepositoryCommand extends Command
+class MakeRepositoryCommand extends BaseGeneratorCommand
 {
-    protected array $config;
-
     protected static $defaultName = 'make:infrastructure:repository';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->config = require __DIR__ . '/../../../config/infrastructure.php';
-    }
 
     protected function configure(): void
     {
         $this
             ->setDescription('Generate a repository implementation repository interface')
-            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
-            ->addOption('pkg-namespace', 'pkg-ns', InputOption::VALUE_OPTIONAL, 'Entity namespace')
-            ->addOption('domain-name', 'd', InputOption::VALUE_OPTIONAL, 'Domain name');
+            ->addOption('entity-name', null, InputOption::VALUE_REQUIRED, 'Entity name')
+            ->addOption('ipkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Infrastructure package namespace')
+            ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name')
+            ->addOption('dpkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Domain package namespace');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $entityName = $input->getOption('name');
-        $packageNamespace = $input->getOption('pkg-namespace') ?: $this->config['default_namespaces']['entity'];
+        $entityName = $input->getOption('entity-name');
         $domainName = $input->getOption('domain-name');
+        $infrastructurePkgNamespace = $input->getOption('ipkg-namespace');
+        $domainPkgNamespace = $input->getOption('dpkg-namespace') ?: $infrastructurePkgNamespace;
 
-        $templatePath = $this->config['templates']['repository'] ?? null;
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new \RuntimeException("Template not found for repository at {$templatePath}");
-        }
+        // get template
+        $template = $this->getTemplate('repository');
 
-        $template = file_get_contents($templatePath);
+        // build namespace
+        $namespace = $infrastructurePkgNamespace;
+        $namespace .= "\\{$this->config['default_namespaces']['mapper']}";
+        $namespace .= "\\{$domainName}";
 
+        // build entityClassPath
+        $entityClassPath = $domainPkgNamespace;
+        $entityClassPath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $entityClassPath .= "\\Entities\\$entityName";
+
+        // build repositoryInterfacePath
+        $repositoryInterfacePath = $domainPkgNamespace;
+        $repositoryInterfacePath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $repositoryInterfacePath .= "\\Repositories\\{$entityName}RepositoryInterface";
+
+        // build mapperClassPath
+        $mapperClassPath = $infrastructurePkgNamespace;
+        $mapperClassPath .= "\\{$this->config['default_namespaces']['mapper']}";
+        $mapperClassPath .= "\\{$domainName}Mapper";
+
+        // build modelClassPath
+        $modelClassPath = $infrastructurePkgNamespace;
+        $modelClassPath .= "\\{$this->config['default_namespaces']['model']}";
+        $modelClassPath .= "\\Eloquent{$domainName}";
+        
         $content = str_replace(
             [
-                '{{ packageNamespace }}', 
-                '{{ repositoryNamespace }}', 
-                '{{ mapperNamespace }}', 
-                '{{ modelNamespace }}', 
-                '{{ domainName }}', 
+                '{{ namespace }}', 
+                '{{ entityClassPath }}', 
+                '{{ repositoryInterfacePath }}', 
+                '{{ mapperClassPath }}', 
+                '{{ modelClassPath }}', 
                 '{{ entityName }}', 
             ],
             [
-                $packageNamespace, 
-                $this->config['default_namespaces']['repository'], 
-                $this->config['default_namespaces']['mapper'], 
-                $this->config['default_namespaces']['model'], 
-                $domainName, 
+                $namespace, 
+                $entityClassPath, 
+                $repositoryInterfacePath, 
+                $mapperClassPath, 
+                $modelClassPath, 
                 $entityName, 
             ],
             $template
         );
 
-        $dir = $this->config['default_paths']['repository'] ?? 'src';
+        // build dir path
+        $dir = "{$this->config['default_paths']['repository']}";
+        $dir .= "/{$domainName}";
         $this->ensureDirectory($dir);
 
         $file = "{$dir}/{$entityName}RepositoryEloquent.php";
@@ -70,12 +86,5 @@ class MakeRepositoryCommand extends Command
         $output->writeln("<info>Repository implementation {$entityName}RepositoryEloquent generated!</info>");
 
         return self::SUCCESS;
-    }
-
-    private function ensureDirectory(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
     }
 }

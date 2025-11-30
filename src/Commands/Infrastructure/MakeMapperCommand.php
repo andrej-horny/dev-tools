@@ -2,28 +2,19 @@
 
 namespace DevTools\Commands\Infrastructure;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeMapperCommand extends Command
+class MakeMapperCommand extends BaseGeneratorCommand
 {
-    protected array $config;
-
     protected static $defaultName = 'make:infrastructure:mapper';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->config = require __DIR__ . '/../../../config/infrastructure.php';
-    }
 
     protected function configure(): void
     {
         $this
             ->setDescription('Generate a mapepr between infrastructure model and domain entity')
-            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Entity name')
+            ->addOption('entity-name', null, InputOption::VALUE_REQUIRED, 'Entity name')
             ->addOption('ipkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Infrastructure package namespace')
             ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name')
             ->addOption('dpkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Domain package namespace');
@@ -31,39 +22,48 @@ class MakeMapperCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $entityName = $input->getOption('name');
+        $entityName = $input->getOption('entity-name');
         $domainName = $input->getOption('domain-name');
         $infrastructurePkgNamespace = $input->getOption('ipkg-namespace');
         $domainPkgNamespace = $input->getOption('dpkg-namespace') ?: $infrastructurePkgNamespace;
 
-        $templatePath = $this->config['templates']['mapper'] ?? null;
-        if (!$templatePath || !file_exists($templatePath)) {
-            throw new \RuntimeException("Template not found for mapper at {$templatePath}");
-        }
+        // get template
+        $template = $this->getTemplate('mapper');
 
-        $template = file_get_contents($templatePath);
+        // build namespace
+        $namespace = $infrastructurePkgNamespace;
+        $namespace .= "\\{$this->config['default_namespaces']['mapper']}";
+        $namespace .= "\\{$domainName}";
+
+        // build entityClassPath
+        $entityClassPath = $domainPkgNamespace;
+        $entityClassPath .= ($domainName !== null) ? "\\Domain\\" . $domainName : ""; 
+        $entityClassPath .= "\\Entities\\$entityName";
+
+        // build modelClassPath
+        $modelClassPath = $infrastructurePkgNamespace;
+        $modelClassPath .= "\\{$this->config['default_namespaces']['model']}";
+        $modelClassPath .= "\\Eloquent{$domainName}";
 
         $content = str_replace(
             [
-                '{{ infrastructurePkgNamespace }}', 
-                '{{ mapperNamespace }}', 
-                '{{ modelNamespace }}', 
-                '{{ domainPkgNamespace }}', 
-                '{{ domainName }}', 
+                '{{ namespace }}', 
+                '{{ modelClassPath }}', 
+                '{{ entityClassPath }}', 
                 '{{ entityName }}', 
             ],
             [
-                $infrastructurePkgNamespace, 
-                $this->config['default_namespaces']['mapper'], 
-                $this->config['default_namespaces']['model'], 
-                $domainPkgNamespace,
-                $domainName, 
+                $namespace, 
+                $modelClassPath,
+                $entityClassPath, 
                 $entityName, 
             ],
             $template
         );
 
-        $dir = $this->config['default_paths']['mapper'] ?? 'src';
+        // build dir path
+        $dir = "{$this->config['default_paths']['mapper']}";
+        $dir .= "/{$domainName}";
         $this->ensureDirectory($dir);
 
         $file = "{$dir}/{$entityName}Mapper.php";
@@ -72,12 +72,5 @@ class MakeMapperCommand extends Command
         $output->writeln("<info>Mapepr {$entityName}Mapper generated!</info>");
 
         return self::SUCCESS;
-    }
-
-    private function ensureDirectory(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
     }
 }

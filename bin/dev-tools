@@ -27,6 +27,7 @@ $application->add(new Domain\MakeRepositoryCommand());
 // infrastructure
 $application->add(new Infrastructure\MakeRepositoryCommand());
 $application->add(new Infrastructure\MakeMapperCommand());
+$application->add(new Infrastructure\MakeModelCommand());
 
 
 $application->run();

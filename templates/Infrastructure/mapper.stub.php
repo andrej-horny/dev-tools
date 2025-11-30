@@ -1,9 +1,9 @@
 <?php
 
-namespace {{ infrastructurePkgNamespace }}\{{ mapperNamespace }}\{{ domainName }};
+namespace {{ namespace }};
 
-use {{ infrastructurePkgNamespace }}\{{ modelNamespace }}\{{ domainName }}\Eloquent{{ entityName }};
-use {{ domainPkgNamespace }}\Entities\{{ domainName }}\{{ entityName }};
+use {{ modelClassPath }};
+use {{ entityClassPath }};
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class {{ entityName }}Mapper
