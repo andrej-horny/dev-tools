@@ -38,7 +38,8 @@ abstract class BaseGeneratorCommand extends Command
         $constructorParams = '';
 
         foreach ($props as $prop) {
-            $constructorParams .= "        private {$prop['type']} \${$prop['name']},\n";
+            $visibility = isset($prop['visibility']) ? $prop['visibility'] : "private";
+            $constructorParams .= "       {$visibility} {$prop['type']} \${$prop['name']},\n";
         }
 
         return $constructorParams;

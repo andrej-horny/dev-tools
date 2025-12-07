@@ -28,6 +28,8 @@ $application->add(new Domain\MakeRepositoryCommand());
 $application->add(new Infrastructure\MakeRepositoryCommand());
 $application->add(new Infrastructure\MakeMapperCommand());
 $application->add(new Infrastructure\MakeModelCommand());
+$application->add(new Infrastructure\MakeCQRSCommandCommand());
+$application->add(new Infrastructure\MakeCQRSHandlerCommand());
 
 
 $application->run();
