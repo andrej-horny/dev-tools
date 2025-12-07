@@ -2,19 +2,36 @@
 
 namespace DevTools\Commands\Infrastructure;
 
+use DevTools\Traits\FileGenerator;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeCQRSCommandCommand extends BaseGeneratorCommand
+#[AsCommand(
+    name: 'make:infrastructure:cqrs-command',
+    description: 'Generate CQRS command for entity.',
+)]
+// class MakeCQRSCommandCommand extends BaseGeneratorCommand
+class MakeCQRSCommandCommand extends Command
 {
-    protected static $defaultName = 'make:infrastructure:cqrs-command';
+    use FileGenerator;
+    
+    // public function __construct()
+    // {
+    //     parent::__construct('make:infrastructure:cqrs-command');
+    // }
+    public function __construct()
+    {
+        parent::__construct();
+        $this->config = require __DIR__ . '/../../../config/infrastructure.php';
+    }
 
     protected function configure(): void
     {
         $this
-            ->setDescription('Generate CQRS command for entity')
             ->addOption('entity-name', null, InputOption::VALUE_REQUIRED, 'Entity name')
             ->addOption('command-name', null, InputOption::VALUE_REQUIRED, 'Command name')
             ->addOption('pkg-namespace', null, InputOption::VALUE_OPTIONAL, 'Infrastructure package namespace')
@@ -53,15 +70,15 @@ class MakeCQRSCommandCommand extends BaseGeneratorCommand
 
         $content = str_replace(
             [
-                '{{ namespace }}', 
-                '{{ entityName }}', 
-                '{{ commandName }}', 
-                '{{ constructorParams }}', 
+                '{{ namespace }}',
+                '{{ entityName }}',
+                '{{ commandName }}',
+                '{{ constructorParams }}',
             ],
             [
-                $namespace, 
-                $entityName, 
-                $commandName, 
+                $namespace,
+                $entityName,
+                $commandName,
                 $constructorParams,
             ],
             $template
@@ -88,6 +105,6 @@ class MakeCQRSCommandCommand extends BaseGeneratorCommand
             $application->find('make:infrastructure:cqrs-handler')->run($repoInput, $output);
         }
 
-        return self::SUCCESS;
+        return Command::SUCCESS;
     }
 }

@@ -18,7 +18,7 @@ class MakeAccessorCommand extends Command
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the PHP class file');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file = $input->getArgument('file');
 

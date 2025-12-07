@@ -19,7 +19,7 @@ class MakeValueObjectCommand extends BaseGeneratorCommand
             ->addArgument('properties', InputArgument::OPTIONAL);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $className = $input->getArgument('name');
         $namespace = $input->getArgument('namespace') ?: $this->config['default_namespaces']['value_object'];

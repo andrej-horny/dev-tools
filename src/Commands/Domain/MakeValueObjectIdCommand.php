@@ -19,7 +19,7 @@ class MakeValueObjectIdCommand extends BaseGeneratorCommand
             ->addOption('domain-name', null, InputOption::VALUE_OPTIONAL, 'Domain name');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityName = $input->getOption('entity-name');
         $packageNamespace = $input->getOption('pkg-namespace');

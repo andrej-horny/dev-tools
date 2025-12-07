@@ -25,7 +25,7 @@ class MakeEntityCommand extends BaseGeneratorCommand
         // ->addOption('with-vo', null, InputOption::VALUE_NONE, 'Also generate property value objects');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $application = $this->getApplication();
         $entityName = $input->getOption('entity-name');

@@ -19,7 +19,7 @@ class MakeAggregateCommand extends BaseGeneratorCommand
             ->addOption('props', null, InputOption::VALUE_OPTIONAL, 'Comma separated props');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $className = $input->getOption('name');
         $namespace = $input->getOption('namespace') ?: $this->config['default_namespaces']['aggregate'];
