@@ -2,6 +2,7 @@
 
 namespace DevTools\Commands\Infrastructure;
 
+use DevTools\Traits\FileGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,14 +10,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'make:infrastructure:cqrs-command',
+    name: 'make:infrastructure:cqrs-handler',
     description: 'Generate CQRS command for entity.',
 )]
-class MakeCQRSHandlerCommand extends BaseGeneratorCommand
+class MakeCQRSHandlerCommand extends Command
 {
+    use FileGenerator;
+
+    protected array $config;
+    
     public function __construct()
     {
-        parent::__construct('make:infrastructure:cqrs-command');
+        parent::__construct();
+        $this->config = require __DIR__ . '/../../../config/infrastructure.php';
     }
 
     protected function configure(): void

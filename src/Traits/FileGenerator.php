@@ -1,19 +1,9 @@
 <?php
 
-namespace DevTools\Commands\Infrastructure;
+namespace DevTools\Traits;
 
-use Symfony\Component\Console\Command\Command;
-
-abstract class BaseGeneratorCommand extends Command
+trait FileGenerator
 {
-    protected array $config;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->config = require __DIR__ . '/../../../config/infrastructure.php';
-    }
-
     protected function getTemplate(string $type): string|null
     {
         $templatePath = $this->config['templates'][$type] ?? null;

@@ -18,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MakeCQRSCommandCommand extends Command
 {
     use FileGenerator;
+
+    protected array $config;
     
     // public function __construct()
     // {
@@ -97,7 +99,7 @@ class MakeCQRSCommandCommand extends Command
         // Optionally generate handler
         if ($input->getOption('with-handler')) {
             $repoInput = new ArrayInput([
-                'command' => 'make:infrastructure:handler',
+                'command' => 'make:infrastructure:cqrs-handler',
                 '--entity-name' => $entityName,
                 '--pkg-namespace' => $packageNamespace,
                 '--handler-name' => $commandName,
